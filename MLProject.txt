@@ -5,7 +5,9 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      train_path: {type: str, default: "dataset_preprocessing/train_clean.csv"}
-      test_path: {type: str, default: "dataset_preprocessing/test_clean.csv"}
+      train_path: {type: str}
+      test_path: {type: str}
     command: >
-      python modelling.py --train_path {train_path} --test_path {test_path}
+      python modelling.py
+      --train_path {train_path}
+      --test_path {test_path}

@@ -1,4 +1,5 @@
 import os
+import argparse
 import pandas as pd
 import xgboost as xgb
 import mlflow
@@ -7,13 +8,6 @@ import numpy as np
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-# Create a new MLflow Experiment
-mlflow.set_experiment("Graduate_Admission2")
-
-mlflow.set_tracking_uri("https://dagshub.com/<username>/<repo>.mlflow")
-os.environ["MLFLOW_TRACKING_USERNAME"] = "<your_dagshub_username>"
-os.environ["MLFLOW_TRACKING_PASSWORD"] = "<your_token>"
-
 def evaluate_model(y_true, y_pred):
     mse = mean_squared_error(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
@@ -21,10 +15,10 @@ def evaluate_model(y_true, y_pred):
     rmse = np.sqrt(mse)
     return mse, mae, r2, rmse
 
-def main():
+def main(train_path, test_path):
     print("📥 Memuat dataset hasil preprocessing...")
-    train_df = pd.read_csv("../preprocessing/Graduate_Admission2_preprocessing/train_clean.csv")
-    test_df = pd.read_csv("../preprocessing/Graduate_Admission2_preprocessing/test_clean.csv")
+    train_df = pd.read_csv(train_path)
+    test_df = pd.read_csv(test_path)
 
     X_train = train_df.drop("Chance_of_Admit", axis=1)
     y_train = train_df["Chance_of_Admit"]
@@ -80,4 +74,18 @@ def main():
     print("✅ Model dan metrik telah disimpan ke MLflow.")
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Train XGBoost model for Graduate Admission prediction.")
+    parser.add_argument("--train_path", type=str, required=True, help="Path to the training dataset CSV.")
+    parser.add_argument("--test_path", type=str, required=True, help="Path to the testing dataset CSV.")
+    args = parser.parse_args()
+
+    # Set MLflow tracking URI using environment variables (for security)
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+    if tracking_uri:
+        mlflow.set_tracking_uri(tracking_uri)
+    else:
+        print("⚠️ MLFLOW_TRACKING_URI tidak ditemukan di environment variable, menggunakan default (local logging).")
+
+    mlflow.set_experiment("Graduate_Admission2")
+
+    main(args.train_path, args.test_path)

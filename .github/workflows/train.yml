@@ -20,11 +20,30 @@ jobs:
         activate-environment: graduate_env
         environment-file: MLProject/conda.yaml
         auto-activate-base: false
+        auto-update-conda: true
 
-    - name: Install MLflow
-      run: pip install mlflow
+    - name: Install MLflow and dependencies
+      shell: bash -l {0}
+      run: |
+        conda activate graduate_env
+        pip install mlflow xgboost scikit-learn pandas
+
+    - name: Set MLflow Tracking credentials
+      run: |
+        echo "MLFLOW_TRACKING_URI=${{ secrets.MLFLOW_TRACKING_URI }}" >> $GITHUB_ENV
+        echo "MLFLOW_TRACKING_USERNAME=${{ secrets.MLFLOW_TRACKING_USERNAME }}" >> $GITHUB_ENV
+        echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
 
     - name: Run MLflow Project
+      shell: bash -l {0}
       run: |
         cd MLProject
-        mlflow run . -P train_path=dataset_preprocessing/train_clean.csv -P test_path=dataset_preprocessing/test_clean.csv
+        mlflow run . \
+          -P train_path=dataset_preprocessing/train_clean.csv \
+          -P test_path=dataset_preprocessing/test_clean.csv
+
+    - name: Upload model artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: best_model
+        path: MLProject/mlruns/
