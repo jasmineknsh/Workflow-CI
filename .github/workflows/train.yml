@@ -1,0 +1,30 @@
+name: Train and Log Model with MLflow
+
+on:
+  push:
+    paths:
+      - 'MLProject/**'
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: graduate_env
+        environment-file: MLProject/conda.yaml
+        auto-activate-base: false
+
+    - name: Install MLflow
+      run: pip install mlflow
+
+    - name: Run MLflow Project
+      run: |
+        cd MLProject
+        mlflow run . -P train_path=dataset_preprocessing/train_clean.csv -P test_path=dataset_preprocessing/test_clean.csv
