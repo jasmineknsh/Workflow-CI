@@ -1,7 +1,11 @@
-name: LoanApprovalTraining
+name: graduate_admission_project
 
 conda_env: conda.yaml
 
 entry_points:
   main:
-    command: "python modelling_tuning.py" 
+    parameters:
+      train_path: {type: str, default: "dataset_preprocessing/train_clean.csv"}
+      test_path: {type: str, default: "dataset_preprocessing/test_clean.csv"}
+    command: >
+      python modelling.py --train_path {train_path} --test_path {test_path}
