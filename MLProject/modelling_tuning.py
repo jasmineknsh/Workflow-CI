@@ -46,6 +46,8 @@ def main(train_path, test_path):
     mse, mae, r2, rmse = evaluate_model(y_test, preds)
 
     print("📦 Logging ke MLflow & menyimpan artefak model...")
+    mlflow.set_tag("mlflow.runName", "xgboost-tuning") 
+
     mlflow.log_params(grid_search.best_params_)
     mlflow.log_metrics({
         "MSE": mse,
