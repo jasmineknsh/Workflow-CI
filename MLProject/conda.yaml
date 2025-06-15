@@ -6,6 +6,7 @@ channels:
 
 dependencies:
   - python=3.12
+  - pip
   - lz4=4.3.2
   - numpy=1.26.4
   - pandas=2.2.2
@@ -13,6 +14,8 @@ dependencies:
   - scikit-learn=1.6.1
   - scipy=1.13.1
   - xgboost=2.1.4
+  - joblib
   
   - pip:
     - mlflow==2.13.0 
+    - dagshub
