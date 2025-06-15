@@ -46,19 +46,18 @@ def main(train_path, test_path):
     mse, mae, r2, rmse = evaluate_model(y_test, preds)
 
     print("📦 Logging ke MLflow & menyimpan artefak model...")
-    with mlflow.start_run(run_name="xgboost-tuning"):
-        mlflow.log_params(grid_search.best_params_)
-        mlflow.log_metrics({
-            "MSE": mse,
-            "MAE": mae,
-            "RMSE": rmse,
-            "R2_Score": r2
-        })
-        mlflow.xgboost.log_model(best_model, "model")
+    mlflow.log_params(grid_search.best_params_)
+    mlflow.log_metrics({
+        "MSE": mse,
+        "MAE": mae,
+        "RMSE": rmse,
+        "R2_Score": r2
+    })
+    mlflow.xgboost.log_model(best_model, "model")
 
-        os.makedirs("artifacts", exist_ok=True)
-        joblib.dump(best_model, "artifacts/xgboost_best_model.pkl")
-        mlflow.log_artifact("artifacts/xgboost_best_model.pkl")
+    os.makedirs("artifacts", exist_ok=True)
+    joblib.dump(best_model, "artifacts/xgboost_best_model.pkl")
+    mlflow.log_artifact("artifacts/xgboost_best_model.pkl")
 
     print("✅ Logging selesai dan artefak berhasil disimpan.")
 
