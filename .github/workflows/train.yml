@@ -12,22 +12,22 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 
 
     - name: Set up Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3 
       with:
-        activate-environment: graduate_env
+     
+        activate-environment: mlflow-env 
         environment-file: MLProject/conda.yaml
         auto-activate-base: false
-      
+        
     - name: Verify environment
+   
+      shell: bash -l {0}
       run: |
         conda info
         conda list
-
-    - name: Install dependencies
-      run: pip install mlflow xgboost scikit-learn pandas joblib
 
     - name: Set MLflow credentials
       run: |
@@ -36,10 +36,11 @@ jobs:
         echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
 
     - name: Run MLflow Project
-      run: |
-        cd MLProject
-        mlflow run . -P train_path=Graduate_Admission2_preprocessing/train_clean.csv -P test_path=Graduate_Admission2_preprocessing/test_clean.csv
 
+      shell: bash -l {0}
+      working-directory: ./MLProject
+      run: mlflow run . 
+    
     - name: Upload trained model to GitHub artifact
       uses: actions/upload-artifact@v4
       with:
