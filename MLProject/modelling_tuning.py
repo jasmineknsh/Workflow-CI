@@ -4,7 +4,6 @@ import xgboost as xgb
 import mlflow
 import mlflow.xgboost
 import numpy as np
-import dagshub
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
@@ -19,13 +18,6 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
 os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 os.environ["MLFLOW_HTTP_REQUEST_HEADER_PROVIDER"] = "mlflow.utils.request_header_provider._basic_auth_header_provider"
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
-
-# Inisialisasi DagsHub Tracking
-dagshub.init(
-    repo_owner='jasmineknsh',
-    repo_name='graduate-admission-mlflow',
-    mlflow=True
-)
 
 mlflow.set_experiment("Graduate_Admission2")
 
