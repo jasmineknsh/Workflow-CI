@@ -9,14 +9,17 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
-
-print("📌 DEBUG ENV:")
+# Debug check
 print("MLFLOW_TRACKING_URI:", os.getenv("MLFLOW_TRACKING_URI"))
 print("MLFLOW_TRACKING_USERNAME:", os.getenv("MLFLOW_TRACKING_USERNAME"))
-print("MLFLOW_TRACKING_PASSWORD:", os.getenv("MLFLOW_TRACKING_PASSWORD")[:5] + "..." if os.getenv("MLFLOW_TRACKING_PASSWORD") else "None")
+print("MLFLOW_TRACKING_PASSWORD:", os.getenv("MLFLOW_TRACKING_PASSWORD")[:5] + "...")
 
-# --- Konfigurasi MLflow dan DagsHub ---
+# Set credentials ke environment agar MLflow bisa pakai Basic Auth
+os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
+os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
+os.environ["MLFLOW_HTTP_REQUEST_HEADER_PROVIDER"] = "mlflow.utils.request_header_provider._basic_auth_header_provider"
 
+# Set URI dan inisialisasi
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 
 dagshub.init(
