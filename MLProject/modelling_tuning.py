@@ -23,7 +23,7 @@ os.environ["MLFLOW_HTTP_REQUEST_HEADER_PROVIDER"] = "mlflow.utils.request_header
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 
 dagshub.init(
-    repo_owner='USERNAME',
+    repo_owner='jasmineknsh',
     repo_name='graduate-admission-mlflow',
     mlflow=True
 )
