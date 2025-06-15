@@ -9,6 +9,12 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
+
+print("📌 DEBUG ENV:")
+print("MLFLOW_TRACKING_URI:", os.getenv("MLFLOW_TRACKING_URI"))
+print("MLFLOW_TRACKING_USERNAME:", os.getenv("MLFLOW_TRACKING_USERNAME"))
+print("MLFLOW_TRACKING_PASSWORD:", os.getenv("MLFLOW_TRACKING_PASSWORD")[:5] + "..." if os.getenv("MLFLOW_TRACKING_PASSWORD") else "None")
+
 # --- Konfigurasi MLflow dan DagsHub ---
 
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
