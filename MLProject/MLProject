@@ -5,6 +5,11 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      train_path: {type: str}
-      test_path: {type: str}
-    command: "python modelling.py --train_path {train_path} --test_path {test_path}"
+      train_path: {type: string, default: "../Graduate_Admission2_preprocessing/train_clean.csv"}
+      test_path: {type: string, default: "../Graduate_Admission2_preprocessing/test_clean.csv"}
+    
+    # <<< BAGIAN PENTING YANG HILANG ADA DI SINI >>>
+    command: >-
+      python modelling_tuning.py
+      --train_path {train_path}
+      --test_path {test_path}
