@@ -7,7 +7,4 @@ entry_points:
     parameters:
       train_path: {type: str}
       test_path: {type: str}
-    command: >
-      python modelling.py
-      --train_path {train_path}
-      --test_path {test_path}
+    command: "python modelling.py --train_path {train_path} --test_path {test_path}"
