@@ -4,10 +4,12 @@ import xgboost as xgb
 import mlflow
 import mlflow.xgboost
 import numpy as np
+import dagshub
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
+dagshub.init(repo_owner='jasmineknsh', repo_name='graduate-admission-mlflow', mlflow=True)
 mlflow.set_experiment("Graduate_Admission2")
 
 def evaluate_model(y_true, y_pred):
