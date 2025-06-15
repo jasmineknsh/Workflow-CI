@@ -1,1 +1,2 @@
-/mlruns
+# Ignore MLflow experiment tracking folder
+mlruns/
