@@ -9,19 +9,18 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
-# Debug check
+# Debug credentials
 print("MLFLOW_TRACKING_URI:", os.getenv("MLFLOW_TRACKING_URI"))
 print("MLFLOW_TRACKING_USERNAME:", os.getenv("MLFLOW_TRACKING_USERNAME"))
 print("MLFLOW_TRACKING_PASSWORD:", os.getenv("MLFLOW_TRACKING_PASSWORD")[:5] + "...")
 
-# Set credentials ke environment agar MLflow bisa pakai Basic Auth
+# Set environment secara eksplisit (penting untuk GitHub Actions atau subshell)
 os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
 os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 os.environ["MLFLOW_HTTP_REQUEST_HEADER_PROVIDER"] = "mlflow.utils.request_header_provider._basic_auth_header_provider"
-
-# Set URI dan inisialisasi
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 
+# Inisialisasi DagsHub Tracking
 dagshub.init(
     repo_owner='jasmineknsh',
     repo_name='graduate-admission-mlflow',
@@ -30,6 +29,7 @@ dagshub.init(
 
 mlflow.set_experiment("Graduate_Admission2")
 
+
 def evaluate_model(y_true, y_pred):
     mse = mean_squared_error(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
@@ -37,51 +37,57 @@ def evaluate_model(y_true, y_pred):
     rmse = np.sqrt(mse)
     return mse, mae, r2, rmse
 
+
 def main(train_path, test_path):
-    print("📥 Memuat dataset hasil preprocessing...")
-    train_df = pd.read_csv(train_path)
-    test_df = pd.read_csv(test_path)
+    try:
+        print("📥 Memuat dataset hasil preprocessing...")
+        train_df = pd.read_csv(train_path)
+        test_df = pd.read_csv(test_path)
 
-    X_train = train_df.drop("Chance_of_Admit", axis=1)
-    y_train = train_df["Chance_of_Admit"]
-    X_test = test_df.drop("Chance_of_Admit", axis=1)
-    y_test = test_df["Chance_of_Admit"]
+        X_train = train_df.drop("Chance_of_Admit", axis=1)
+        y_train = train_df["Chance_of_Admit"]
+        X_test = test_df.drop("Chance_of_Admit", axis=1)
+        y_test = test_df["Chance_of_Admit"]
 
-    print("🚀 Hyperparameter Tuning XGBoost dengan GridSearchCV...")
-    param_grid = {
-        'max_depth': [3, 5],
-        'learning_rate': [0.01, 0.1],
-        'n_estimators': [100],
-        'subsample': [1.0]
-    }
+        print("🚀 Hyperparameter Tuning XGBoost dengan GridSearchCV...")
+        param_grid = {
+            'max_depth': [3, 5],
+            'learning_rate': [0.01, 0.1],
+            'n_estimators': [100],
+            'subsample': [1.0]
+        }
 
-    model = xgb.XGBRegressor(random_state=42)
-    grid_search = GridSearchCV(model, param_grid, scoring='neg_mean_squared_error', cv=3)
-    grid_search.fit(X_train, y_train)
+        model = xgb.XGBRegressor(random_state=42)
+        grid_search = GridSearchCV(model, param_grid, scoring='neg_mean_squared_error', cv=3)
+        grid_search.fit(X_train, y_train)
 
-    best_model = grid_search.best_estimator_
-    print("✅ Best Parameters:", grid_search.best_params_)
+        best_model = grid_search.best_estimator_
+        print("✅ Best Parameters:", grid_search.best_params_)
 
-    preds = best_model.predict(X_test)
-    mse, mae, r2, rmse = evaluate_model(y_test, preds)
+        preds = best_model.predict(X_test)
+        mse, mae, r2, rmse = evaluate_model(y_test, preds)
 
-    print("📦 Logging ke MLflow & menyimpan artefak model...")
+        print("📦 Logging ke MLflow & menyimpan artefak model...")
 
-    with mlflow.start_run():  # Tambahkan konteks eksplisit
-        mlflow.log_params(grid_search.best_params_)
-        mlflow.log_metrics({
-            "MSE": mse,
-            "MAE": mae,
-            "RMSE": rmse,
-            "R2_Score": r2
-        })
-        mlflow.xgboost.log_model(best_model, "model")
+        with mlflow.start_run():
+            mlflow.log_params(grid_search.best_params_)
+            mlflow.log_metrics({
+                "MSE": mse,
+                "MAE": mae,
+                "RMSE": rmse,
+                "R2_Score": r2
+            })
+            mlflow.xgboost.log_model(best_model, "model")
 
-        os.makedirs("artifacts", exist_ok=True)
-        joblib.dump(best_model, "artifacts/xgboost_best_model.pkl")
-        mlflow.log_artifact("artifacts/xgboost_best_model.pkl")
+            os.makedirs("artifacts", exist_ok=True)
+            joblib.dump(best_model, "artifacts/xgboost_best_model.pkl")
+            mlflow.log_artifact("artifacts/xgboost_best_model.pkl")
 
-    print("✅ Logging selesai dan artefak berhasil disimpan.")
+        print("✅ Logging selesai dan artefak berhasil disimpan.")
+
+    except Exception as e:
+        print("❌ MLflow run gagal:", str(e))
+
 
 if __name__ == "__main__":
     import argparse
