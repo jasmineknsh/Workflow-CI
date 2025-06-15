@@ -20,6 +20,11 @@ jobs:
         activate-environment: graduate_env
         environment-file: MLProject/conda.yaml
         auto-activate-base: false
+      
+    - name: Verify environment
+      run: |
+        conda info
+        conda list
 
     - name: Install dependencies
       run: pip install mlflow xgboost scikit-learn pandas joblib
