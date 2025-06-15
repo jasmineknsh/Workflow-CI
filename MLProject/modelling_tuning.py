@@ -10,14 +10,13 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
 # --- Konfigurasi MLflow dan DagsHub ---
-os.environ["DAGSHUB_TOKEN"] = os.getenv("DAGSHUB_TOKEN")
+
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 
 dagshub.init(
-    repo_owner='011-JasmineKinasih',  # Ganti dengan username kamu di DagsHub
+    repo_owner='USERNAME',
     repo_name='graduate-admission-mlflow',
-    mlflow=True,
-    token=os.getenv("DAGSHUB_TOKEN")
+    mlflow=True
 )
 
 mlflow.set_experiment("Graduate_Admission2")
