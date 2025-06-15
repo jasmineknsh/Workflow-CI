@@ -12,36 +12,39 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4 
+      uses: actions/checkout@v4
 
     - name: Set up Miniconda
-      uses: conda-incubator/setup-miniconda@v3 
+      uses: conda-incubator/setup-miniconda@v3
       with:
-     
-        activate-environment: mlflow-env 
+        # Nama environment ini harus cocok dengan yang ada di conda.yaml
+        activate-environment: mlflow-env
         environment-file: MLProject/conda.yaml
         auto-activate-base: false
         
     - name: Verify environment
-   
+      # Menambahkan shell: bash -l {0} agar bisa menjalankan perintah conda
       shell: bash -l {0}
       run: |
         conda info
         conda list
 
-    - name: Set MLflow credentials
+    - name: Set MLflow and DAGsHub credentials
+      # Mengatur environment variables agar bisa diakses oleh dagshub.init() dan MLflow
       run: |
         echo "MLFLOW_TRACKING_URI=${{ secrets.MLFLOW_TRACKING_URI }}" >> $GITHUB_ENV
         echo "MLFLOW_TRACKING_USERNAME=${{ secrets.MLFLOW_TRACKING_USERNAME }}" >> $GITHUB_ENV
         echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
+        echo "DAGSHUB_TOKEN=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
 
     - name: Run MLflow Project
-
+      # Menjalankan perintah di dalam login shell dan working directory yang benar
       shell: bash -l {0}
       working-directory: ./MLProject
-      run: mlflow run . 
+      run: mlflow run .
     
     - name: Upload trained model to GitHub artifact
+      # Menyimpan model sebagai artefak hasil dari workflow
       uses: actions/upload-artifact@v4
       with:
         name: trained-model
