@@ -6,7 +6,7 @@ import mlflow.xgboost
 import numpy as np
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-import joblib  # untuk menyimpan model
+import joblib
 
 mlflow.set_experiment("Graduate_Admission2")
 
@@ -46,17 +46,15 @@ def main(train_path, test_path):
     mse, mae, r2, rmse = evaluate_model(y_test, preds)
 
     print("📦 Logging ke MLflow & menyimpan artefak model...")
-    with mlflow.start_run():
-        mlflow.log_params(grid_search.best_params_)
-        mlflow.log_metrics({
-            "MSE": mse,
-            "MAE": mae,
-            "RMSE": rmse,
-            "R2_Score": r2
-        })
-        mlflow.xgboost.log_model(best_model, "model")
+    mlflow.log_params(grid_search.best_params_)
+    mlflow.log_metrics({
+        "MSE": mse,
+        "MAE": mae,
+        "RMSE": rmse,
+        "R2_Score": r2
+    })
+    mlflow.xgboost.log_model(best_model, "model")
 
-    # Simpan model secara lokal (untuk diupload sebagai artefak)
     os.makedirs("artifacts", exist_ok=True)
     joblib.dump(best_model, "artifacts/xgboost_best_model.pkl")
 
@@ -66,5 +64,4 @@ if __name__ == "__main__":
     parser.add_argument("--train_path", type=str, required=True)
     parser.add_argument("--test_path", type=str, required=True)
     args = parser.parse_args()
-
     main(args.train_path, args.test_path)
