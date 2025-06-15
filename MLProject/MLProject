@@ -5,8 +5,8 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      train_path: {type: string, default: "../Graduate_Admission2_preprocessing/train_clean.csv"}
-      test_path: {type: string, default: "../Graduate_Admission2_preprocessing/test_clean.csv"}
+      train_path: {type: string, default: "Graduate_Admission2_preprocessing/train_clean.csv"}
+      test_path: {type: string, default: "Graduate_Admission2_preprocessing/test_clean.csv"}
     
     # <<< BAGIAN PENTING YANG HILANG ADA DI SINI >>>
     command: >-
