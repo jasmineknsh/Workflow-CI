@@ -9,7 +9,17 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
 
-dagshub.init(repo_owner='jasmineknsh', repo_name='graduate-admission-mlflow', mlflow=True)
+# --- Konfigurasi MLflow dan DagsHub ---
+os.environ["DAGSHUB_TOKEN"] = os.getenv("DAGSHUB_TOKEN")
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
+
+dagshub.init(
+    repo_owner='011-JasmineKinasih',  # Ganti dengan username kamu di DagsHub
+    repo_name='graduate-admission-mlflow',
+    mlflow=True,
+    token=os.getenv("DAGSHUB_TOKEN")
+)
+
 mlflow.set_experiment("Graduate_Admission2")
 
 def evaluate_model(y_true, y_pred):
@@ -48,18 +58,20 @@ def main(train_path, test_path):
     mse, mae, r2, rmse = evaluate_model(y_test, preds)
 
     print("📦 Logging ke MLflow & menyimpan artefak model...")
-    mlflow.log_params(grid_search.best_params_)
-    mlflow.log_metrics({
-        "MSE": mse,
-        "MAE": mae,
-        "RMSE": rmse,
-        "R2_Score": r2
-    })
-    mlflow.xgboost.log_model(best_model, "model")
 
-    os.makedirs("artifacts", exist_ok=True)
-    joblib.dump(best_model, "artifacts/xgboost_best_model.pkl")
-    mlflow.log_artifact("artifacts/xgboost_best_model.pkl")
+    with mlflow.start_run():  # Tambahkan konteks eksplisit
+        mlflow.log_params(grid_search.best_params_)
+        mlflow.log_metrics({
+            "MSE": mse,
+            "MAE": mae,
+            "RMSE": rmse,
+            "R2_Score": r2
+        })
+        mlflow.xgboost.log_model(best_model, "model")
+
+        os.makedirs("artifacts", exist_ok=True)
+        joblib.dump(best_model, "artifacts/xgboost_best_model.pkl")
+        mlflow.log_artifact("artifacts/xgboost_best_model.pkl")
 
     print("✅ Logging selesai dan artefak berhasil disimpan.")
 
