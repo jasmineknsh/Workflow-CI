@@ -1,2 +1,7 @@
 # Ignore MLflow experiment tracking folder
 mlruns/
+
+# Ignore downloaded model artifacts
+MLProject/downloaded_model/
+
+artifacts/
